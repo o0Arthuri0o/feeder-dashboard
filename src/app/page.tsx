@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Separator } from "@/components/ui/separator"
 import Modal from "./ui/Modal";
 import Table from "./ui/Table"
+import Select  from "./ui/Select";
 
 export default function Home() {
   return (
@@ -14,8 +15,9 @@ export default function Home() {
           <Separator />
       </div>
 
-      <div className="mt-10 w-full" >
-         <Table/>
+      <div className="mt-10 w-full flex flex-col gap-5" >
+        <Select/>
+        <Table/>
       </div>
      
 
