@@ -13,40 +13,6 @@ import { deleteFeeder } from "@/lib/actions"
 import EditDelete from "./EditDelete"
 import { PrismaClient } from "@prisma/client"
 const prisma = new PrismaClient();
-// const feeders = [
-//     {
-//         Vessel: "INESSA",
-//         Voyage: "223W",
-//         ETD: "12.03.2024",
-//         ETA:"17.03.2024",
-//         POL:"Klang",
-//         POD:"Karachi",
-//     },
-//     {
-//         Vessel: "HUA Xin",
-//         Voyage: "V. 03-24",
-//         ETD: "16.03.2024",
-//         ETA:"21.03.2024",
-//         POL:"Klang",
-//         POD:"Karachi"
-//     },
-//     {
-//         Vessel: "HAFFU LONGER",
-//         Voyage: "118HL",
-//         ETD: "25.03.2024",
-//         ETA:"01.04.2024",
-//         POL:"Klang",
-//         POD:"Karachi"
-//     },
-//     {
-//         Vessel: "Coral Driver",
-//         Voyage: "PKLCMB030",
-//         ETD: "01.04.2024",
-//         ETA:"06.04.2024",
-//         POL:"Klang",
-//         POD:"Karachi"
-//     }
-// ]
 
   export default async function TableDemo({role}: {role: string}) {
     const feeders = await prisma.feeder.findMany()

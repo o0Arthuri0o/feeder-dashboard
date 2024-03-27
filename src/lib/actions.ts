@@ -116,11 +116,11 @@ export async function editFeeder(feeder: FeederProps) {
                 console.log(updateFeeder)
                 revalidatePath('/?role=admin')
             } else {
-                console.log(verify, 'verify wasted')
+                // console.log(verify, 'verify wasted')
                 redirect("/")
             }
         } else {
-            console.log(verify, 'verify wasted')
+            // console.log(verify, 'verify wasted')
             redirect("/")
         }
     }
@@ -134,7 +134,7 @@ type FeederAfterXlS = {
     POD: string,
     POL: string,
 }
-export async function downloadNewFeeders(feeders: FeederAfterXlS[]) {
+export async function downloadNewFeeders(feeders: FeederAfterXlS[], tracks: string[]) {
     const session = cookies().get('session')
     if(!session) {
         redirect("/")
@@ -144,6 +144,7 @@ export async function downloadNewFeeders(feeders: FeederAfterXlS[]) {
             const password = verify.password
             if(password === process.env.PASSWORD) {
                 // console.log('verify succes')
+                saveTracks(tracks)
                 
             } else {
                 // console.log(verify, 'verify wasted')
@@ -154,4 +155,16 @@ export async function downloadNewFeeders(feeders: FeederAfterXlS[]) {
             redirect("/")
         }
     }
+}
+
+const saveTracks = (tracks: string[]) => {
+    const arrayOfTrackObj = tracks.map(item => {
+        let arrayOfPolPod = item.split('=>')
+        let objTrack = {
+            POL: arrayOfPolPod[0],
+            POD: arrayOfPolPod[1],
+        }
+        return objTrack
+    })
+    console.log(arrayOfTrackObj)
 }
