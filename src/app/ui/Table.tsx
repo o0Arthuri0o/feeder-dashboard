@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button"
 import {
     Table,
     TableBody,
@@ -8,6 +9,8 @@ import {
     TableHeader,
     TableRow,
   } from "@/components/ui/table"
+import { deleteFeeder } from "@/lib/actions"
+import EditDelete from "./EditDelete"
 
 const feeders = [
     {
@@ -44,7 +47,7 @@ const feeders = [
     }
 ]
 
-  export default function TableDemo() {
+  export default function TableDemo({role}: {role: string}) {
     return (
       <Table>
         <TableCaption>Таблица актуальных фидеров.</TableCaption>
@@ -56,7 +59,6 @@ const feeders = [
             <TableHead>ETA</TableHead>
             <TableHead>POL</TableHead>
             <TableHead>POD</TableHead>
-            {/* <TableHead className="text-right">Amount</TableHead> */}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -68,6 +70,9 @@ const feeders = [
               <TableCell>{feeder.ETD}</TableCell>
               <TableCell className="font-bold" >{feeder.POL}</TableCell>
               <TableCell className="font-bold" >{feeder.POD}</TableCell>
+              {role ? <TableCell className="font-bold" >
+                <EditDelete/>
+              </TableCell> : null}
             </TableRow>
           ))}
         </TableBody>
