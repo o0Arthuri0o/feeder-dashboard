@@ -3,9 +3,10 @@
 import { SignJWT, jwtVerify } from "jose";
 import { redirect } from 'next/navigation'
 import { cookies } from "next/headers";
-import { unstable_noStore as noStore } from 'next/cache';
+import { unstable_noStore as noStore, revalidatePath } from 'next/cache';
+import { PrismaClient } from "@prisma/client";
 
-
+const prisma = new PrismaClient()
 const secret = process.env.SECRETE_KEY;
 const key = new TextEncoder().encode(secret)
 
@@ -62,7 +63,13 @@ export async function deleteFeeder (id: string) {
             const password = verify.password
             if(password === process.env.PASSWORD) {
                 // console.log('verify succes')
-                console.log(id)
+                const deleteFeeder = await prisma.feeder.delete({
+                    where: {
+                        id: id,
+                    }
+                })
+                revalidatePath('/')
+                console.log(deleteFeeder)
             } else {
                 // console.log(verify, 'verify wasted')
                 redirect("/")
@@ -74,7 +81,16 @@ export async function deleteFeeder (id: string) {
     }
 }
 
-export async function editFeeder(id: string) {
+type FeederProps = {
+    id: string,
+    Vessel: string,
+    Voyage: string,
+    ETA: string,
+    ETD: string,
+    POD: string,
+    POL: string,
+}
+export async function editFeeder(feeder: FeederProps) {
     const session = cookies().get('session')
     if(!session) {
         redirect("/")
@@ -83,8 +99,22 @@ export async function editFeeder(id: string) {
         if(verify) {
             const password = verify.password
             if(password === process.env.PASSWORD) {
-                console.log(id)
-
+                // console.log(feeder.id)
+                const updateFeeder = await prisma.feeder.update({
+                    where: {
+                        id: feeder.id,
+                    },
+                    data: {
+                        Vessel:feeder.Vessel,
+                        Voyage: feeder.Voyage,
+                        ETA: feeder.ETA,
+                        ETD: feeder.ETD,
+                        POD: feeder.POD,
+                        POL: feeder.POL,
+                    },
+                })
+                console.log(updateFeeder)
+                revalidatePath('/?role=admin')
             } else {
                 console.log(verify, 'verify wasted')
                 redirect("/")
