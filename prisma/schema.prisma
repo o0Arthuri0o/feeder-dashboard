@@ -14,17 +14,17 @@ datasource db {
 }
 
 model Feeder {
-  id  String @id @default(uuid())
-  Vessel String
+  Vessel String 
   Voyage String
   ETD String
   ETA String
   POL String
-  POD String
+  POD String  
+  @@id(name: "compoundFeederId", [Vessel, Voyage, ETD, ETA, POL, POD])
 }
 
 model Track {
-  id  String @id @default(uuid())
-  POL String
-  POD String
+  POL String 
+  POD String 
+  @@id(name: "compoundTrackId", [POL, POD])
 }

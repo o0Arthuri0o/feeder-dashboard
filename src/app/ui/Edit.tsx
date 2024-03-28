@@ -14,10 +14,9 @@ import {
   import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { checkPassword, editFeeder } from "@/lib/actions"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 type EditProps = {
-    id: string,
     Vessel: string,
     Voyage: string,
     ETA: string,
@@ -28,7 +27,6 @@ type EditProps = {
 
 function Edit({feeder}: {feeder: EditProps}) {
     const [inputFeeder, setFeederStateInput] = useState({
-        id: feeder.id,
         Vessel: feeder.Vessel,
         Voyage: feeder.Voyage,
         ETA: feeder.ETA,
@@ -36,6 +34,20 @@ function Edit({feeder}: {feeder: EditProps}) {
         POD: feeder.POD,
         POL: feeder.POL,
     })
+    let oldAndUpdateFeeder = {
+        newFeeder: inputFeeder,
+        oldFeeder: {
+            Vessel: feeder.Vessel,
+            Voyage: feeder.Voyage,
+            ETA: feeder.ETA,
+            ETD: feeder.ETD,
+            POD: feeder.POD,
+            POL: feeder.POL,
+        }
+    }
+    useEffect(() => {
+        oldAndUpdateFeeder.newFeeder = {...inputFeeder}
+    }, [inputFeeder])
 
     return (
     <AlertDialog>
@@ -80,7 +92,7 @@ function Edit({feeder}: {feeder: EditProps}) {
             
             <AlertDialogFooter>
                 <AlertDialogCancel>Отмена</AlertDialogCancel>
-                <AlertDialogAction onClick={() => editFeeder(inputFeeder)} >Продолжить</AlertDialogAction>
+                <AlertDialogAction onClick={() => editFeeder(oldAndUpdateFeeder)} >Продолжить</AlertDialogAction>
             </AlertDialogFooter>
         </AlertDialogContent>
     </AlertDialog>

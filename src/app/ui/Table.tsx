@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button"
 import {
     Table,
     TableBody,
@@ -9,7 +8,6 @@ import {
     TableHeader,
     TableRow,
   } from "@/components/ui/table"
-import { deleteFeeder } from "@/lib/actions"
 import EditDelete from "./EditDelete"
 import { PrismaClient } from "@prisma/client"
 const prisma = new PrismaClient();

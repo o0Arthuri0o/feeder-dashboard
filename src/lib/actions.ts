@@ -53,7 +53,7 @@ export async function checkPassword(password: string) {
     }
 }
 
-export async function deleteFeeder (id: string) {
+export async function deleteFeeder (feeder: FeederProps) {
     const session = cookies().get('session')
     if(!session) {
         redirect("/")
@@ -65,7 +65,14 @@ export async function deleteFeeder (id: string) {
                 // console.log('verify succes')
                 const deleteFeeder = await prisma.feeder.delete({
                     where: {
-                        id: id,
+                        compoundFeederId: {
+                            Vessel: feeder.Vessel,
+                            Voyage: feeder.Voyage,
+                            ETD: feeder.ETD,
+                            ETA: feeder.ETA,
+                            POL: feeder.POL,
+                            POD: feeder.POD
+                        }
                     }
                 })
                 revalidatePath('/')
@@ -82,7 +89,6 @@ export async function deleteFeeder (id: string) {
 }
 
 type FeederProps = {
-    id: string,
     Vessel: string,
     Voyage: string,
     ETA: string,
@@ -90,7 +96,27 @@ type FeederProps = {
     POD: string,
     POL: string,
 }
-export async function editFeeder(feeder: FeederProps) {
+
+
+type FeederEditProps = {
+    oldFeeder: {
+        Vessel: string,
+        Voyage: string,
+        ETA: string,
+        ETD: string,
+        POD: string,
+        POL: string,
+    }
+    newFeeder: {
+        Vessel: string,
+        Voyage: string,
+        ETA: string,
+        ETD: string,
+        POD: string,
+        POL: string,
+    }
+}
+export async function editFeeder(feeder: FeederEditProps) {
     const session = cookies().get('session')
     if(!session) {
         redirect("/")
@@ -102,19 +128,26 @@ export async function editFeeder(feeder: FeederProps) {
                 // console.log(feeder.id)
                 const updateFeeder = await prisma.feeder.update({
                     where: {
-                        id: feeder.id,
+                        compoundFeederId: {
+                            Vessel: feeder.oldFeeder.Vessel,
+                            Voyage: feeder.oldFeeder.Voyage,
+                            ETD: feeder.oldFeeder.ETD,
+                            ETA: feeder.oldFeeder.ETA,
+                            POL: feeder.oldFeeder.POL,
+                            POD: feeder.oldFeeder.POD
+                        }
                     },
                     data: {
-                        Vessel:feeder.Vessel,
-                        Voyage: feeder.Voyage,
-                        ETA: feeder.ETA,
-                        ETD: feeder.ETD,
-                        POD: feeder.POD,
-                        POL: feeder.POL,
+                        Vessel:feeder.newFeeder.Vessel,
+                        Voyage: feeder.newFeeder.Voyage,
+                        ETD: feeder.newFeeder.ETD,
+                        ETA: feeder.newFeeder.ETA,
+                        POD: feeder.newFeeder.POD,
+                        POL: feeder.newFeeder.POL,
                     },
                 })
                 console.log(updateFeeder)
-                revalidatePath('/?role=admin')
+                revalidatePath('/')
             } else {
                 // console.log(verify, 'verify wasted')
                 redirect("/")
@@ -134,7 +167,7 @@ type FeederAfterXlS = {
     POD: string,
     POL: string,
 }
-export async function downloadNewFeeders(feeders: FeederAfterXlS[], tracks: string[]) {
+export async function downloadNewFeeders({feeders, tracks}: {feeders: string[][], tracks: string[]}) {
     const session = cookies().get('session')
     if(!session) {
         redirect("/")
@@ -144,7 +177,13 @@ export async function downloadNewFeeders(feeders: FeederAfterXlS[], tracks: stri
             const password = verify.password
             if(password === process.env.PASSWORD) {
                 // console.log('verify succes')
-                saveTracks(tracks)
+                const upserTracks = await saveTracks(tracks)
+                let upsertFeeders;
+                if(upserTracks) {
+                    upsertFeeders = await saveFeeders(feeders)
+                }
+                if(upsertFeeders) revalidatePath('/')
+                
                 
             } else {
                 // console.log(verify, 'verify wasted')
@@ -157,7 +196,7 @@ export async function downloadNewFeeders(feeders: FeederAfterXlS[], tracks: stri
     }
 }
 
-const saveTracks = (tracks: string[]) => {
+const saveTracks = async(tracks: string[]) => {
     const arrayOfTrackObj = tracks.map(item => {
         let arrayOfPolPod = item.split('=>')
         let objTrack = {
@@ -166,5 +205,49 @@ const saveTracks = (tracks: string[]) => {
         }
         return objTrack
     })
-    console.log(arrayOfTrackObj)
+    for(let track of arrayOfTrackObj) {
+        const upsertTrack = await prisma.track.upsert({
+            where: {
+                compoundTrackId:{
+                    POL: track.POL,
+                    POD: track.POD
+                }
+            },
+            update: {},
+            create: {
+                POL: track.POL,
+                POD: track.POD
+            }
+        })
+        // console.log(upsertTrack)
+    }
+    return 1
+}
+
+const saveFeeders = async(feeders: string[][]) => {
+    for(let feeder of feeders) {
+        const upsertFeeder = await prisma.feeder.upsert({
+            where: {
+               compoundFeederId: {
+                Vessel: feeder[0],
+                Voyage: feeder[1],
+                ETD: feeder[2],
+                ETA: feeder[3],
+                POL: feeder[4],
+                POD: feeder[5],
+               }
+            },
+            update: {},
+            create: {
+                Vessel: feeder[0],
+                Voyage: feeder[1],
+                ETD: feeder[2],
+                ETA: feeder[3],
+                POL: feeder[4],
+                POD: feeder[5],
+            }
+        })
+        // console.log(upsertFeeder)
+    }
+    return 1;
 }

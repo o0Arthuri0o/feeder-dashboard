@@ -12,7 +12,7 @@ import {
   } from "@/components/ui/alert-dialog"
   import { Button } from "@/components/ui/button"
 import { downloadNewFeeders } from "@/lib/actions"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import React from 'react'
 import * as XLSX from 'xlsx'
 
@@ -23,6 +23,26 @@ type FeederAfterXlS = {
   ETA: string,
   POD: string,
   POL: string,
+}
+
+function ExcelDateToJSDate(serial: number) {
+  var utc_days  = Math.floor(serial - 25569);
+  var utc_value = utc_days * 86400;                                        
+  var date_info = new Date(utc_value * 1000);
+
+  var fractional_day = serial - Math.floor(serial) + 0.0000001;
+
+  var total_seconds = Math.floor(86400 * fractional_day);
+
+  var seconds = total_seconds % 60;
+
+  total_seconds -= seconds;
+
+  var hours = Math.floor(total_seconds / (60 * 60));
+  var minutes = Math.floor(total_seconds / 60) % 60;
+  let rusData =  new Date(date_info.getFullYear(), date_info.getMonth(), date_info.getDate(), hours, minutes, seconds).toLocaleString("ru");
+  rusData = rusData.split(', ')[0]
+  return rusData
 }
 
 
@@ -47,7 +67,26 @@ type FeederAfterXlS = {
         }
       };
     };
-    // console.log(dataInput)
+
+    let feeders: string[][] = []
+    useEffect(() => {
+      if(dataInput) {
+        console.log(dataInput)
+        for(let item of dataInput) {
+          let feederSmallArray = [
+            item.Vessel,
+            item.Voyage,
+            `${ExcelDateToJSDate(+item.ETD)}`,
+            `${ExcelDateToJSDate(+item.ETA)}`,
+            item.POL,
+            item.POD
+          ]
+          feeders.push(feederSmallArray)
+        }
+        console.log(feeders)
+      }
+    }, [dataInput])
+  
     let tracks: any[] | null = null;
     if(dataInput){
       let setOfTracks = new Set();
@@ -55,7 +94,6 @@ type FeederAfterXlS = {
         let track = `${feeder.POL}=>${feeder.POD}`
         setOfTracks.add(track)
       }
-      console.log(setOfTracks)
       tracks = Array.from(setOfTracks)
     }
     
@@ -78,7 +116,7 @@ type FeederAfterXlS = {
           <AlertDialogFooter>
             <AlertDialogCancel>Отмена</AlertDialogCancel>
             {tracks ? 
-              <AlertDialogAction onClick={() => dataInput&&tracks ? downloadNewFeeders(dataInput, tracks) : null} >
+              <AlertDialogAction onClick={() => dataInput&&tracks ? downloadNewFeeders({feeders: feeders, tracks}) : null} >
                 Продолжить
               </AlertDialogAction>
               : <AlertDialogAction disabled>Продолжить</AlertDialogAction>
