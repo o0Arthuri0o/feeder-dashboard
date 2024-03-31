@@ -33,6 +33,11 @@ export async function decrypt(input: string): Promise<any> {
     return verifySucces;
 }
 
+export async function quitAdmin() {
+    cookies().delete('session')
+    redirect('/')
+}
+
 
 
 
@@ -75,8 +80,25 @@ export async function deleteFeeder (feeder: FeederProps) {
                         }
                     }
                 })
+                const checkOldTrack = await prisma.feeder.findMany({
+                    where:{
+                        POL:feeder.POD.trim(),
+                        POD:feeder.POL.trim(),
+                    }
+                })
+             
+                if(checkOldTrack.length === 0) {
+                    await prisma.track.delete({
+                        where:{
+                            compoundTrackId:{
+                                POD: feeder.POD,
+                                POL:feeder.POL,
+                            }
+                        }
+                    })
+                }
                 revalidatePath('/')
-                console.log(deleteFeeder)
+                // console.log(deleteFeeder)
             } else {
                 // console.log(verify, 'verify wasted')
                 redirect("/")

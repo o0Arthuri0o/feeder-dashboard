@@ -13,8 +13,10 @@ import { PrismaClient } from "@prisma/client"
 const prisma = new PrismaClient();
 import { unstable_noStore as noStore } from "next/cache";
 import { redirect } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import SortButton from "./SortButton";
 
-  export default async function TableDemo({role, track}: {role: string|undefined, track: string|undefined}) {
+  export default async function TableDemo({role, track, isTopSort}: {role: string|undefined, track: string|undefined, isTopSort: string | undefined}) {
     noStore()
     let feeders;
     if(track && track !== '-') {
@@ -38,7 +40,25 @@ import { redirect } from "next/navigation";
     } else {
        feeders = await prisma.feeder.findMany()
     }
+
+
+    if(isTopSort && isTopSort.trim() === 'false') {
+      feeders = feeders.sort((a, b) => {
+        const dateA = new Date(a.ETD.trim().split('.').reverse().join('-'));
+        const dateB = new Date(b.ETD.trim().split('.').reverse().join('-'));
+        console.log(dateA.getTime() - dateB.getTime(), dateA, dateB)
+        return dateA.getTime() - dateB.getTime();
+      });
+      
+    } else {
+      feeders = feeders.sort((a, b) => {
+        const dateA = new Date(a.ETD.trim().split('.').reverse().join('-'));
+        const dateB = new Date(b.ETD.trim().split('.').reverse().join('-'));
+        return dateB.getTime() - dateA.getTime();
+      });
+    }
     
+        
     return (
       <Table>
         <TableCaption>Таблица актуальных фидеров.</TableCaption>
@@ -46,7 +66,10 @@ import { redirect } from "next/navigation";
           <TableRow>
             <TableHead>Vessel</TableHead>
             <TableHead>Voyage</TableHead>
-            <TableHead>ETD</TableHead>
+            <TableHead className="flex items-center" >
+              ETD
+              <SortButton/>
+            </TableHead>
             <TableHead>ETA</TableHead>
             <TableHead>POL</TableHead>
             <TableHead>POD</TableHead>
