@@ -11,10 +11,34 @@ import {
 import EditDelete from "./EditDelete"
 import { PrismaClient } from "@prisma/client"
 const prisma = new PrismaClient();
+import { unstable_noStore as noStore } from "next/cache";
+import { redirect } from "next/navigation";
 
-  export default async function TableDemo({role}: {role: string}) {
-    const feeders = await prisma.feeder.findMany()
-    // console.log(feeders)
+  export default async function TableDemo({role, track}: {role: string|undefined, track: string|undefined}) {
+    noStore()
+    let feeders;
+    if(track && track !== '-') {
+        // track = track.slice(1)
+        const [POL, POD] = track.split('=>')
+        console.log(POL.trim(),POD.trim())
+       feeders = await prisma.feeder.findMany({
+        where: {
+          AND: [
+            { POL: POL.trim() },
+            { POD: POD.trim() },
+          ],
+        },
+      })
+    } else if(track === "-") {
+      if(role) {
+        redirect('/?role=admin')
+      } else {
+        redirect('/')
+      }
+    } else {
+       feeders = await prisma.feeder.findMany()
+    }
+    
     return (
       <Table>
         <TableCaption>Таблица актуальных фидеров.</TableCaption>
@@ -30,7 +54,7 @@ const prisma = new PrismaClient();
         </TableHeader>
         <TableBody>
           {feeders?.map((feeder) => (
-            <TableRow >
+            <TableRow key={feeder.Voyage+feeder.Vessel+feeder.ETA+feeder.ETD}>
               <TableCell className="font-medium">{feeder.Vessel}</TableCell>
               <TableCell>{feeder.Voyage}</TableCell>
               <TableCell>{feeder.ETD}</TableCell>

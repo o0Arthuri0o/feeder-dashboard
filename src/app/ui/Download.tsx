@@ -48,11 +48,13 @@ function ExcelDateToJSDate(serial: number) {
 
   export function Download({role}: {role: string}) {
     const refInput = useRef<HTMLInputElement | null>(null)
-    const [dataInput, setDataInput] = useState<FeederAfterXlS[]>()
+    const [dataInput, setDataInput] = useState<FeederAfterXlS[] | null>()
+    const [fileName, setFileName] = useState('')
 
     const upload = (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (file) {
+        setFileName(file.name)
         const reader = new FileReader();
         reader.readAsBinaryString(file);
         reader.onload = (e: ProgressEvent<FileReader>) => {
@@ -94,9 +96,15 @@ function ExcelDateToJSDate(serial: number) {
         let track = `${feeder.POL}=>${feeder.POD}`
         setOfTracks.add(track)
       }
+     
       tracks = Array.from(setOfTracks)
     }
     
+    const handleClick = () => {
+      if(tracks) downloadNewFeeders({feeders: feeders, tracks})
+      setDataInput(null)
+      setFileName('')
+    }
  
     return (
     (role === "admin" ?
@@ -113,10 +121,11 @@ function ExcelDateToJSDate(serial: number) {
           </AlertDialogHeader>
           <input type="file" accept=".xls, .xlsx" ref={refInput} className="h-0 w-0 opacity-0 m-0" onChange={(e) => upload(e)} />
           <Button onClick={() => refInput.current?.click()} >Загрузить</Button>
+          <p className="flex justify-center" >{fileName}</p>
           <AlertDialogFooter>
             <AlertDialogCancel>Отмена</AlertDialogCancel>
             {tracks ? 
-              <AlertDialogAction onClick={() => dataInput&&tracks ? downloadNewFeeders({feeders: feeders, tracks}) : null} >
+              <AlertDialogAction onClick={() => dataInput&&tracks ? handleClick() : null} >
                 Продолжить
               </AlertDialogAction>
               : <AlertDialogAction disabled>Продолжить</AlertDialogAction>

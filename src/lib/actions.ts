@@ -146,7 +146,44 @@ export async function editFeeder(feeder: FeederEditProps) {
                         POL: feeder.newFeeder.POL,
                     },
                 })
-                console.log(updateFeeder)
+
+                const checkTrack = await prisma.track.findUnique({
+                    where:{
+                        compoundTrackId:{
+                            POD:feeder.newFeeder.POD,
+                            POL: feeder.newFeeder.POL,
+                        }
+                    }
+                })
+             
+                if(!checkTrack) {
+                    const newTrack = await prisma.track.create({
+                        data:{
+                            POD:feeder.newFeeder.POD,
+                            POL:feeder.newFeeder.POL,
+                        }
+                    })
+                }
+
+                const checkOldTrack = await prisma.feeder.findMany({
+                    where:{
+                        POL:feeder.oldFeeder.POD.trim(),
+                        POD:feeder.oldFeeder.POL.trim(),
+                    }
+                })
+             
+                if(checkOldTrack.length === 0) {
+                    await prisma.track.delete({
+                        where:{
+                            compoundTrackId:{
+                                POD: feeder.oldFeeder.POD,
+                                POL:feeder.oldFeeder.POL,
+                            }
+                        }
+                    })
+                }
+
+                // console.log(updateFeeder)
                 revalidatePath('/')
             } else {
                 // console.log(verify, 'verify wasted')
@@ -250,4 +287,43 @@ const saveFeeders = async(feeders: string[][]) => {
         // console.log(upsertFeeder)
     }
     return 1;
+}
+
+type CreateFeeder = {
+    Vessel: string,
+    Voyage: string,
+    ETA: string,
+    ETD: string,
+    POD: string,
+    POL: string,
+}
+export async function createNewFeeder(feeder: CreateFeeder) {
+    const newFeeder = await prisma.feeder.create({
+        data: {
+            Vessel: feeder.Vessel,
+            Voyage: feeder.Voyage,
+            ETD: feeder.ETD,
+            ETA: feeder.ETA,
+            POL: feeder.POL,
+            POD: feeder.POD,
+        }
+    })
+    const checkTrack = await prisma.track.findUnique({
+        where:{
+            compoundTrackId:{
+                POD:feeder.POD,
+                POL: feeder.POL,
+            }
+        }
+    })
+ 
+    if(!checkTrack) {
+        const newTrack = await prisma.track.create({
+            data:{
+                POD:feeder.POD,
+                POL:feeder.POL,
+            }
+        })
+    }
+    revalidatePath('/')
 }
