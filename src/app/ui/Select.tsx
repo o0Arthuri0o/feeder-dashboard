@@ -18,18 +18,18 @@ type TrackProps = {
 }
 
 export default function SelectDemo({tracks, role}: {tracks: TrackProps[], role: string|undefined}) {
-    const [currentTrack, setCurrentTrack] = useState('')
+    const [currentTrack, setCurrentTrack] = useState("")
     const router = useRouter()
     useEffect(() => {
-        if(currentTrack !== "" && currentTrack){
-            if(role || currentTrack !== "-") {
+        if(currentTrack !== ""){
+            if(role && currentTrack !== "-") {
                 router.push(`/?role=admin&&track=${currentTrack}`)
             } else if(role && currentTrack === "-"){
                 router.push(`/?role=admin`)
             } else if(currentTrack === "-") {
-                router.push(`/?role=admin`)
+                router.push(`/`)
             } else {
-                router.push(`/?role=admin&&track=${currentTrack}`)
+                router.push(`/?track=${currentTrack}`)
             }
         }
     }, [currentTrack])

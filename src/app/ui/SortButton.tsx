@@ -13,14 +13,17 @@ function SortButton() {
     if(params.has('role')) path += '?role=admin'
     if(params.has('track')) {
         let track = params.get('track')
-        path += `&&track=${track}`
+        if(params.has('role')) path += `&&track=${track}`
+        else path += `?track=${track}`
+        
     }
 
     const handleClick = () => {
         setIsTopSort(prev => !prev)
         if(isTopSort){
-            router.push(path+'&&isTopSort=false')
-        } else router.push(path+'&&isTopSort=true')
+            if(params.has('role') || params.has('track')) router.push(path+'&&isTopSort=false')
+            else router.push(path+'?isTopSort=false')
+        } else router.push(path)
     }
   return (
     

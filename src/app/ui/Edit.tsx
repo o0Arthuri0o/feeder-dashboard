@@ -5,7 +5,6 @@ import {
     AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
-    AlertDialogDescription,
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
@@ -13,8 +12,10 @@ import {
   } from "@/components/ui/alert-dialog"
   import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { checkPassword, editFeeder } from "@/lib/actions"
+import {editFeeder } from "@/lib/actions"
 import { useEffect, useState } from "react"
+
+
 
 type EditProps = {
     Vessel: string,
@@ -26,16 +27,19 @@ type EditProps = {
 }
 
 function Edit({feeder}: {feeder: EditProps}) {
+  
     const [inputFeeder, setFeederStateInput] = useState({
-        Vessel: feeder.Vessel,
-        Voyage: feeder.Voyage,
-        ETA: feeder.ETA,
-        ETD: feeder.ETD,
-        POD: feeder.POD,
-        POL: feeder.POL,
+        Vessel: "",
+        Voyage: "",
+        ETA: "",
+        ETD: "",
+        POD: "",
+        POL: "",
     })
+    
+    
     let oldAndUpdateFeeder = {
-        newFeeder: inputFeeder,
+        newFeeder: {...inputFeeder},
         oldFeeder: {
             Vessel: feeder.Vessel,
             Voyage: feeder.Voyage,
@@ -45,9 +49,25 @@ function Edit({feeder}: {feeder: EditProps}) {
             POL: feeder.POL,
         }
     }
+
     useEffect(() => {
+        setFeederStateInput({...feeder})
+        
+    }, [feeder])
+
+    
+    const handleClick = () => {
         oldAndUpdateFeeder.newFeeder = {...inputFeeder}
-    }, [inputFeeder])
+        setFeederStateInput({
+            Vessel: "",
+            Voyage: "",
+            ETA: "",
+            ETD: "",
+            POD: "",
+            POL: "",
+        })
+        editFeeder(oldAndUpdateFeeder)
+    }
 
     return (
     <AlertDialog>
@@ -92,7 +112,7 @@ function Edit({feeder}: {feeder: EditProps}) {
             
             <AlertDialogFooter>
                 <AlertDialogCancel>Отмена</AlertDialogCancel>
-                <AlertDialogAction onClick={() => editFeeder(oldAndUpdateFeeder)} >Продолжить</AlertDialogAction>
+                <AlertDialogAction onClick={() => handleClick()} >Продолжить</AlertDialogAction>
             </AlertDialogFooter>
         </AlertDialogContent>
     </AlertDialog>

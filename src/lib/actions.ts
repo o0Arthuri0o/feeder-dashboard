@@ -42,7 +42,7 @@ export async function quitAdmin() {
 
 
 export async function checkPassword(password: string) {
-    noStore()
+    
     // const password = formData.get('password')
     if(process.env.PASSWORD === password) {
         console.log(password)
@@ -80,14 +80,15 @@ export async function deleteFeeder (feeder: FeederProps) {
                         }
                     }
                 })
+
                 const checkOldTrack = await prisma.feeder.findMany({
                     where:{
-                        POL:feeder.POD.trim(),
-                        POD:feeder.POL.trim(),
+                        POL: feeder.POL,
+                        POD: feeder.POD,
                     }
                 })
-             
-                if(checkOldTrack.length === 0) {
+            
+                if(checkOldTrack.length === 0 || !checkOldTrack) {
                     await prisma.track.delete({
                         where:{
                             compoundTrackId:{
@@ -189,12 +190,12 @@ export async function editFeeder(feeder: FeederEditProps) {
 
                 const checkOldTrack = await prisma.feeder.findMany({
                     where:{
-                        POL:feeder.oldFeeder.POD.trim(),
-                        POD:feeder.oldFeeder.POL.trim(),
+                        POL: feeder.oldFeeder.POL,
+                        POD: feeder.oldFeeder.POD,
                     }
                 })
-             
-                if(checkOldTrack.length === 0) {
+            
+                if(checkOldTrack.length === 0 || !checkOldTrack) {
                     await prisma.track.delete({
                         where:{
                             compoundTrackId:{

@@ -19,12 +19,16 @@ import { useState } from "react"
 
 function Modal({role}: {role: string}) {
     const [password, setPasword] = useState('')
-    console.log("Modal", role)
+    const handleClick = () => {
+        checkPassword(password)
+        setPasword('')
+    }
+
   return (
     (role !== "admin" ? 
         <AlertDialog>
             <AlertDialogTrigger asChild>
-                <Button variant="outline">Admin</Button>
+                <Button variant="outline">Админ</Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
                 <AlertDialogHeader>
@@ -36,12 +40,12 @@ function Modal({role}: {role: string}) {
                 <Input value={password} onChange={(e) => setPasword(e.target.value)} />
                 <AlertDialogFooter>
                     <AlertDialogCancel>Отмена</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => checkPassword(password)} >Продолжить</AlertDialogAction>
+                    <AlertDialogAction onClick={() => handleClick()} >Продолжить</AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
         :
-        <h2>Admin mode</h2>
+        <h2>Админ мод</h2>
     )
     
   )

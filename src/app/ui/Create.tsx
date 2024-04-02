@@ -11,12 +11,13 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
   } from "@/components/ui/alert-dialog"
-  import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { createNewFeeder } from "@/lib/actions"
 import {useState } from "react"
+import { DatePickerDemo } from "./DatePicker"
 
-type CreateFeeder = {
+export type CreateFeeder = {
     Vessel: string,
     Voyage: string,
     ETA: string,
@@ -37,6 +38,7 @@ function Create() {
 
     const handleClick = (inputFeeder: CreateFeeder) => {
         createNewFeeder(inputFeeder)
+        
         setFeederStateInput({
             Vessel: '',
             Voyage: '',
@@ -68,11 +70,13 @@ function Create() {
             </div>
             <div className="flex gap-11 items-center" >
                 ETD
-                <Input value={inputFeeder.ETD} onChange={(e) => setFeederStateInput({...inputFeeder, ETD: e.target.value})} />
+                <DatePickerDemo onChange={(e: string) => setFeederStateInput({...inputFeeder, ETD: e})} />
+                {/* <Input value={inputFeeder.ETD} onChange={(e) => setFeederStateInput({...inputFeeder, ETD: e.target.value})} /> */}
             </div>
             <div className="flex gap-11 items-center" >
                 ETA
-                <Input value={inputFeeder.ETA} onChange={(e) => setFeederStateInput({...inputFeeder, ETA: e.target.value})} />
+                <DatePickerDemo onChange={(e: string) => setFeederStateInput({...inputFeeder, ETA: e})}/>
+                {/* <Input value={inputFeeder.ETA} onChange={(e) => setFeederStateInput({...inputFeeder, ETA: e.target.value})} /> */}
             </div>
             <div className="flex gap-10 items-center" >
                 POL

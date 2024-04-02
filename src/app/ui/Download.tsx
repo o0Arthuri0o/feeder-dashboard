@@ -46,7 +46,7 @@ function ExcelDateToJSDate(serial: number) {
 }
 
 
-  export function Download({role}: {role: string}) {
+  export function Download() {
     const refInput = useRef<HTMLInputElement | null>(null)
     const [dataInput, setDataInput] = useState<FeederAfterXlS[] | null>()
     const [fileName, setFileName] = useState('')
@@ -107,7 +107,7 @@ function ExcelDateToJSDate(serial: number) {
     }
  
     return (
-    (role === "admin" ?
+
       <AlertDialog>
         <AlertDialogTrigger asChild>
           <Button variant="outline">Загрузить файл</Button>
@@ -133,8 +133,5 @@ function ExcelDateToJSDate(serial: number) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      :
-      null
-    )
     )
   }

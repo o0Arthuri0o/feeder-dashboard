@@ -58,6 +58,7 @@ import SortButton from "./SortButton";
       });
     }
     
+   
         
     return (
       <Table>
@@ -86,7 +87,9 @@ import SortButton from "./SortButton";
               <TableCell className="font-bold" >{feeder.POD}</TableCell>
               {role ? <TableCell className="font-bold" >
                 <EditDelete feeder = {feeder} />
-              </TableCell> : null}
+                </TableCell> 
+                : null
+              }
             </TableRow>
           ))}
         </TableBody>

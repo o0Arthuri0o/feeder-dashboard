@@ -6,10 +6,7 @@ import Select  from "./ui/Select";
 import { Download } from "./ui/Download";
 import { unstable_noStore as noStore } from "next/cache";
 import { PrismaClient } from "@prisma/client";
-import { Button } from "@/components/ui/button";
 import Create from "./ui/Create";
-import { redirect } from 'next/navigation'
-import { cookies } from "next/headers";
 import QuitButton from "./ui/QuitButton";
 
 const prisma = new PrismaClient()
@@ -37,10 +34,12 @@ export default async function Home(prop: any) {
       <div className="mt-10 w-full flex flex-col gap-5" >
         <div className="w-full flex justify-between" >
           <Select tracks={tracks} role={role}/>
-          <div className="flex gap-4" >
-            <Create/>
-            <Download role={role} />
-          </div>
+          {role && 
+            <div className="flex gap-4" >
+              <Create/>
+              <Download/>
+            </div>
+          }
         </div>
         
         <Table role={role} track={track} isTopSort={isTopSort} />
