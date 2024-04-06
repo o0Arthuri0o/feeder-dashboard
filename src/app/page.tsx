@@ -4,7 +4,7 @@ import Modal from "./ui/Modal";
 import Table from "./ui/Table"
 import Select  from "./ui/Select";
 import { Download } from "./ui/Download";
-import { unstable_noStore as noStore } from "next/cache";
+
 import { PrismaClient } from "@prisma/client";
 import Create from "./ui/Create";
 import QuitButton from "./ui/QuitButton";
@@ -12,9 +12,10 @@ import QuitButton from "./ui/QuitButton";
 const prisma = new PrismaClient()
 
 export default async function Home(prop: any) {
-  noStore()
+
   const {role, track, isTopSort} = prop.searchParams
   const tracks = await prisma.track.findMany()
+  console.log(track)
 
   return (
     <main className="flex min-h-screen flex-col items-center p-12">
