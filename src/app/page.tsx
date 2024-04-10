@@ -4,10 +4,11 @@ import Modal from "./ui/Modal";
 import Table from "./ui/Table"
 import Select  from "./ui/Select";
 import { Download } from "./ui/Download";
-
+import { Skeleton } from "@/components/ui/skeleton"
 import { PrismaClient } from "@prisma/client";
 import Create from "./ui/Create";
 import QuitButton from "./ui/QuitButton";
+import { Suspense } from "react";
 
 const prisma = new PrismaClient()
 
@@ -42,8 +43,10 @@ export default async function Home(prop: any) {
             </div>
           }
         </div>
+        <Suspense fallback={<Skeleton className="w-[95%] h-[400px] rounded-md" />} >
+          <Table role={role} track={track} isTopSort={isTopSort} />
+        </Suspense>
         
-        <Table role={role} track={track} isTopSort={isTopSort} />
       </div>
      
 
